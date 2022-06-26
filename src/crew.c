@@ -48,6 +48,10 @@ struct CREW_T
   pthread_cond_t   empty;
 };
 
+#ifdef __OS2__
+BOOLEAN volatile os2_pthread_cancel_requested;
+#endif
+
 CREW
 new_crew(int size, int maxsize, BOOLEAN block)
 {
@@ -102,6 +106,12 @@ private void
   CREW this = (CREW)crew;
 
   while (TRUE) {
+
+#ifdef __OS2__
+    if (os2_pthread_cancel_requested)
+      break;
+#endif
+
     if ((c = pthread_mutex_lock(&(this->lock))) != 0) {
       NOTIFY(FATAL, "mutex lock"); 
     }
@@ -215,6 +225,13 @@ crew_cancel(CREW this)
 #if defined(hpux) || defined(__hpux)
     pthread_kill(this->threads[x], SIGUSR1); 
 #else
+#ifdef __OS2__
+    /* libc does not fully implement pthread_cancel so
+       we need to fake it via polling within loops that will not return on their
+       own
+    */
+    os2_pthread_cancel_requested = TRUE;
+#endif
     pthread_cancel(this->threads[x]); 
 #endif
   }
