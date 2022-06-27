@@ -424,6 +424,12 @@ http_post(CONN *C, URL U)
   return TRUE;
 }
 
+#ifdef __OS2__
+extern BOOLEAN volatile os2_pthread_cancel_requested;
+#endif
+
+
+
 /**
  * returns HEADERS struct
  * reads from http/https socket and parses
@@ -439,6 +445,13 @@ http_read_headers(CONN *C, URL U)
   RESPONSE resp = new_response();
   
   while (TRUE) {
+
+#ifdef __OS2__
+    if (os2_pthread_cancel_requested) {
+      return NULL;
+    }
+#endif
+
     x = 0;
     //memset(&line, '\0', MAX_COOKIE_SIZE); //VL issue #4
     while ((n = socket_read(C, &c, 1)) == 1) {
