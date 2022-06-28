@@ -274,6 +274,9 @@ __request(CONN *C, char *fmt, ...)
   }
 }
 
+#ifdef __OS2__
+extern BOOLEAN volatile os2_pthread_cancel_requested;
+#endif
 
 private int
 __response(CONN *C) 
@@ -287,6 +290,12 @@ __response(CONN *C)
     int x;
 
     while (TRUE) {
+
+#ifdef __OS2__
+    if (os2_pthread_cancel_requested)
+      break;                            /* Exit internal loop quickly */
+#endif
+
       x = 0;
       memset(C->chkbuf, '\0', sizeof(C->chkbuf));
       while ((n = socket_read(C, &c, 1)) == 1) {

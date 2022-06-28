@@ -428,8 +428,6 @@ http_post(CONN *C, URL U)
 extern BOOLEAN volatile os2_pthread_cancel_requested;
 #endif
 
-
-
 /**
  * returns HEADERS struct
  * reads from http/https socket and parses
