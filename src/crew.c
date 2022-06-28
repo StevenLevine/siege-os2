@@ -225,6 +225,9 @@ crew_cancel(CREW this)
 #if defined(hpux) || defined(__hpux)
     pthread_kill(this->threads[x], SIGUSR1); 
 #else
+    pthread_cancel(this->threads[x]); 
+#endif
+  }
 #ifdef __OS2__
     /* libc does not fully implement pthread_cancel so
        we need to fake it via polling within loops that will not return on their
@@ -232,9 +235,7 @@ crew_cancel(CREW this)
     */
     os2_pthread_cancel_requested = TRUE;
 #endif
-    pthread_cancel(this->threads[x]); 
-#endif
-  }
+
   return TRUE;
 }
 

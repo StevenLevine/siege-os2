@@ -215,6 +215,15 @@ browser_get_lomark(BROWSER this)
   return this->lomark;
 }
 
+/**
+ * Worker routine called by crew_thread
+ * Runs until asked to die or killed
+ */
+
+#ifdef __OS2__
+BOOLEAN volatile os2_pthread_cancel_requested;
+#endif
+
 void *
 start(BROWSER this)
 {
@@ -262,7 +271,13 @@ start(BROWSER this)
   len = (my.reps == -1) ? (int)array_length(this->urls) : my.reps;
   y   = (my.reps == -1) ? 0 : this->id * (my.length / my.cusers);
   max_y = (int)array_length(this->urls);
+
   for (x = 0; x < len; x++, y++) {
+
+#ifdef __OS2__
+    if (os2_pthread_cancel_requested)
+      break;                            /* Exit outer loop */
+#endif
     x = ((my.secs > 0) && ((my.reps <= 0)||(my.reps == MAXREPS))) ? 0 : x;
     if (my.internet == TRUE) {
       y = (unsigned int) (((double)pthread_rand_np(&(this->rseed)) /
@@ -345,7 +360,7 @@ start(BROWSER this)
     if (my.failures > 0 && my.failed >= my.failures) {
       break;
     }
-  }
+  } /* for */
 
 #ifdef SIGNAL_CLIENT_PLATFORM
 #else/*CANCEL_CLIENT_PLATFORM*/

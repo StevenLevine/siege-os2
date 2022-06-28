@@ -27,6 +27,10 @@
 #include <notify.h>
 #include <joedog/boolean.h>
 
+#ifdef __OS2__
+BOOLEAN volatile os2_pthread_cancel_requested;
+#endif
+
 void
 siege_timer(pthread_t handler)
 {
@@ -44,6 +48,10 @@ siege_timer(pthread_t handler)
 
   pthread_mutex_lock(&timer_mutex); 
   for (;;) {
+#ifdef __OS2__
+    if (os2_pthread_cancel_requested)
+      break;
+#endif
     err = pthread_cond_timedwait( &timer_cond, &timer_mutex, &timeout);
     if (err == ETIMEDOUT) { 
       /* timed out  */
