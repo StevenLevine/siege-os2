@@ -28,7 +28,7 @@
 #include <joedog/boolean.h>
 
 #ifdef __OS2__
-BOOLEAN volatile os2_pthread_cancel_requested;
+extern BOOLEAN volatile os2_pthread_cancel_requested;
 #endif
 
 void
