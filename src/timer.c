@@ -49,6 +49,7 @@ siege_timer(pthread_t handler)
   pthread_mutex_lock(&timer_mutex); 
   for (;;) {
 #ifdef __OS2__
+    /* Probably cannot occur */
     if (os2_pthread_cancel_requested)
       break;
 #endif
@@ -59,6 +60,10 @@ siege_timer(pthread_t handler)
       /*if(our.shutting_down != TRUE){ pthread_kill(handler, SIGTERM); }*/
       my.verbose = FALSE;
       pthread_kill(handler, SIGTERM);
+#ifdef __OS2__
+      os2_pthread_cancel_requested = TRUE;
+      break;
+#endif
       break;  
     } else {
       continue;
