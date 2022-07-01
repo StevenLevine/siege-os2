@@ -309,7 +309,7 @@ start(BROWSER this)
     URL tmp = array_get(this->urls, y);
     if (tmp != NULL && url_get_hostname(tmp) != NULL) {
       this->auth.bids.www = 0; /* reset */
-      if ((ret = __request(this, tmp))==FALSE) {
+      if ((ret = __request(this, tmp))==FALSE && !os2_pthread_cancel_requested) {
         __increment_failures();
       }
     }
