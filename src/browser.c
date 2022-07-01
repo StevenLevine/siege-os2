@@ -333,7 +333,7 @@ start(BROWSER this)
           this->auth.bids.www = 0;
           // We'll only request files on the same host as the page
           if (! __no_follow(url_get_hostname(u))) {
-            if ((ret = __request(this, u))==FALSE) {
+            if ((ret = __request(this, u))==FALSE  && !os2_pthread_cancel_requested) {
               __increment_failures();
             }
           }
